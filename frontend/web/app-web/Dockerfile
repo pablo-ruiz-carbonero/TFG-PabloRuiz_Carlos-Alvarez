@@ -3,13 +3,12 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install --legacy-peer-deps
 COPY . .
-ARG VITE_API_URL=http://localhost:3000
-ARG VITE_USE_MOCK_API=false
-ARG VITE_OPENWEATHER_API_KEY=REMOVED_SECRET
-ENV VITE_API_URL=$VITE_API_URL
-ENV VITE_USE_MOCK_API=$VITE_USE_MOCK_API
-ENV VITE_OPENWEATHER_API_KEY=$VITE_OPENWEATHER_API_KEY
-RUN npm run build
+# Load environment variables from .env at build time so the build uses the same values
+# as the mobile Dockerfile and the project's .env file. .env should be provided alongside the source.
+COPY .env .env
+# Export all variables from .env for the duration of the build step and run the build.
+# Using 'set -a' ensures variables are exported into the environment.
+RUN set -a && . .env && set +a && npm run build
 
 FROM nginx:alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
