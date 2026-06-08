@@ -1,20 +1,23 @@
+env_file:
+  - .env
+
 services:
   mysql:
     image: mysql:8.0
     container_name: tfg_mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: tfg_agricola
-      MYSQL_USER: tfg_user
-      MYSQL_PASSWORD: tfg_password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-tfg_agricola}
+      MYSQL_USER: ${MYSQL_USER:-tfg_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-tfg_password}
     ports:
       - "3310:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ../database:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "tfg_user", "-ptfg_password"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${MYSQL_USER:-tfg_user}", "-p${MYSQL_PASSWORD:-tfg_password}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -26,14 +29,14 @@ services:
     container_name: tfg_backend
     restart: always
     environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: tfg_user
-      DB_PASS: tfg_password
-      DB_NAME: tfg_agricola
-      JWT_SECRET: agro_link_secret_key_2024
-      JWT_EXPIRES: 7d
-      NODE_ENV: production
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USER: ${DB_USER:-tfg_user}
+      DB_PASS: ${DB_PASS:-tfg_password}
+      DB_NAME: ${DB_NAME:-tfg_agricola}
+      JWT_SECRET: ${JWT_SECRET:-agro_link_secret_key_2024}
+      JWT_EXPIRES: ${JWT_EXPIRES:-7d}
+      NODE_ENV: ${NODE_ENV:-production}
     ports:
       - "3000:3000"
     depends_on:
@@ -45,9 +48,9 @@ services:
       context: ../frontend/web/app-web
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: http://localhost:3000
-        VITE_USE_MOCK_API: "false"
-        VITE_OPENWEATHER_API_KEY: REMOVED_SECRET
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3000}
+        VITE_USE_MOCK_API: ${VITE_USE_MOCK_API:-"false"}
+        VITE_OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
     container_name: tfg_frontend
     restart: always
     ports:
