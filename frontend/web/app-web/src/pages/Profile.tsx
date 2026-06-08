@@ -1,3 +1,4 @@
+// Pagina de perfil: edicion de datos de contacto, cambio de contrasena y gestion de anuncios publicados.
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { marketService } from '../services/marketService';
@@ -30,15 +31,16 @@ export const Profile: React.FC = () => {
   const [deleteSuccess, setDeleteSuccess] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
-  // Sync state if user context updates (e.g. role switcher triggers name update)
+  // Sincronizar los campos del formulario cuando el contexto de usuario cambia (por ejemplo al cambiar el rol de demo)
   useEffect(() => {
     if (user) {
+      // Eliminar el sufijo de rol demo "(Farmer)" del nombre antes de mostrarlo en el campo
       setName(user.name.split(' (')[0]);
       setPhone(user.phone);
     }
   }, [user]);
 
-  // Load user's marketplace products
+  // Cargar solo los productos publicados por el usuario actual filtrando por sellerId
   const loadMyProducts = async () => {
     if (!user) return;
     setProductsLoading(true);

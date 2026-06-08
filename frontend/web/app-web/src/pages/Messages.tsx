@@ -1,4 +1,6 @@
+// Pagina de mensajeria en tiempo real: lista de chats, visualizacion de mensajes y envio mediante Socket.io.
 import React, { useEffect, useState, useRef } from 'react';
+import { io, Socket } from 'socket.io-client';
 import { useAuth } from '../context/AuthContext';
 import { chatService } from '../services/chatService';
 import { Chat, Message, UserRole } from '../types';
@@ -13,29 +15,83 @@ export const Messages: React.FC = () => {
   const [activeChat, setActiveChat] = useState<Chat | null>(null);
   const [typedMessage, setTypedMessage] = useState('');
   const [loading, setLoading] = useState(true);
-  
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  // Ref para acceder al chat activo dentro del handler del socket sin que quede capturado en el closure inicial
+  const activeChatRef = useRef<Chat | null>(null);
+  const socketRef = useRef<Socket | null>(null);
+
+  // Mantener la ref siempre sincronizada con el estado actual para evitar stale closures en el socket
+  useEffect(() => { activeChatRef.current = activeChat; }, [activeChat]);
+
+  // Recargar la lista de chats cada vez que cambia el usuario activo
   useEffect(() => {
     loadChats();
   }, [user]);
 
-  // Handle incoming selection from Marketplace redirect
+  // Conexion Socket.io para recibir mensajes entrantes en tiempo real
+  useEffect(() => {
+    if (!user) return;
+    const token = localStorage.getItem('agro_token');
+    const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+
+    // Conectar al namespace /messages del servidor con el token JWT en el handshake
+    const socket = io(`${apiUrl}/messages`, {
+      auth: { token },
+      transports: ['websocket'],
+    });
+    socketRef.current = socket;
+
+    socket.on('connect', () => {
+      // Unirse a la sala personal del usuario para recibir solo sus mensajes
+      socket.emit('join', Number(user.id));
+    });
+
+    socket.on('new_message', (msg: any) => {
+      const incoming: Message = {
+        id: msg.id ?? '',
+        senderId: msg.senderId ?? '',
+        senderName: '',
+        receiverId: user.id,
+        receiverName: user.name ?? '',
+        content: msg.text ?? '',
+        timestamp: msg.timestamp ?? new Date().toISOString(),
+        read: false,
+      };
+
+      setChats(prev => prev.map(chat => {
+        if (chat.id === msg.conversationId) {
+          const updated = { ...chat, messages: [...chat.messages, incoming], lastMessage: incoming };
+          // Se usa activeChatRef (no activeChat) para evitar leer un closure obsoleto
+          if (activeChatRef.current?.id === chat.id) {
+            setActiveChat(updated);
+          }
+          return updated;
+        }
+        return chat;
+      }));
+    });
+
+    // Desconectar el socket al desmontar para liberar recursos
+    return () => { socket.disconnect(); };
+  }, [user]);
+
+  // Seleccionar automaticamente el chat del vendedor cuando se llega desde el Marketplace
   useEffect(() => {
     if (chats.length === 0) return;
-    
+
     const state = location.state as { selectParticipantId?: string } | null;
     if (state && state.selectParticipantId) {
       const targetChat = chats.find(c => c.participantId === state.selectParticipantId);
       if (targetChat) {
         setActiveChat(targetChat);
-        // Clear history state so it doesn't lock selection
+        // Limpiar el estado de la ruta para que una recarga no vuelva a forzar la seleccion
         window.history.replaceState({}, document.title);
       }
     }
   }, [chats, location.state]);
 
-  // Scroll to bottom of chat on change
+  // Desplazar el scroll al ultimo mensaje cada vez que llega uno nuevo
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [activeChat?.messages]);
@@ -69,10 +125,9 @@ export const Messages: React.FC = () => {
     setTypedMessage('');
 
     try {
-      // 1. Send the message
       const sentMsg = await chatService.sendMessage(user.id, activeChat.participantId, textToSend);
-      
-      // 2. Optimistic local update
+
+      // Actualizacion optimista: añadir el mensaje enviado al estado local sin esperar a recargar los chats
       const updatedMessages = [...activeChat.messages, sentMsg];
       const updatedActiveChat = {
         ...activeChat,
@@ -82,13 +137,13 @@ export const Messages: React.FC = () => {
       
       setActiveChat(updatedActiveChat);
       
-      // Update chat list order and content
+      // Mover el chat activo al principio de la lista (como WhatsApp/Telegram)
       setChats(prev => {
         const otherChats = prev.filter(c => c.id !== activeChat.id);
         return [updatedActiveChat, ...otherChats];
       });
 
-      // 3. Trigger mock response if running in development mode
+      // En modo mock se simula una respuesta automatica del otro participante tras 1.5 segundos
       if (import.meta.env.VITE_USE_MOCK_API === 'true') {
         simulateResponse(activeChat.participantId, activeChat.participantName, textToSend);
       }
@@ -97,11 +152,12 @@ export const Messages: React.FC = () => {
     }
   };
 
+  // Genera una respuesta contextual automatica del otro usuario para hacer la demo mas realista
   const simulateResponse = (receiverId: string, receiverName: string, userMsg: string) => {
     setTimeout(async () => {
       if (!user) return;
-      
-      // Generate some smart agricultural replies
+
+      // Seleccionar la replica segun palabras clave del mensaje del usuario
       let reply = 'Hola. He recibido tu mensaje. Lo reviso y te comento en breve.';
       const lower = userMsg.toLowerCase();
       
@@ -116,14 +172,13 @@ export const Messages: React.FC = () => {
       }
 
       try {
-        // Send reply message in reverse order (other user to current user)
+        // El mensaje simulado se envia en sentido inverso (el otro participante al usuario actual)
         const receivedMsg = await chatService.sendMessage(receiverId, user.id, reply);
-        
-        // Refresh chats to load the new message correctly
+
         const data = await chatService.getChats(user.id);
         setChats(data);
-        
-        // If current chat is still the same one, update active window
+
+        // Solo actualizar la ventana activa si el usuario no ha cambiado de chat durante el timeout
         setActiveChat(prev => {
           if (prev && prev.participantId === receiverId) {
             return {
@@ -140,16 +195,16 @@ export const Messages: React.FC = () => {
     }, 1500);
   };
 
+  // Abre un chat y marca como leidos todos los mensajes del otro participante
   const handleSelectChat = async (chat: Chat) => {
     if (!user) return;
     setActiveChat(chat);
-    
-    // Mark messages as read
+
     try {
       await chatService.markAsRead(chat.id, user.id);
-      
-      // Update unread status in the local sidebar chat list
-      setChats(prev => 
+
+      // Actualizar el indicador de no leidos en la barra lateral sin recargar todos los chats
+      setChats(prev =>
         prev.map(c => {
           if (c.id === chat.id) {
             return {
@@ -189,6 +244,7 @@ export const Messages: React.FC = () => {
     return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
   };
 
+  // Devuelve true si hay mensajes del participante que aun no han sido leidos
   const hasUnread = (chat: Chat) => {
     if (!user) return false;
     return chat.messages.some(m => m.senderId === chat.participantId && !m.read);

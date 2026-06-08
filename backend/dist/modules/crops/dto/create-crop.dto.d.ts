@@ -2,7 +2,7 @@ export declare class CreateCropDto {
     nombre: string;
     variedad: string;
     tipo_cultivo: string;
-    parcela_id: number;
+    parcela_id?: number;
     superficie: number;
     fecha_siembra: string;
     fase_actual?: string;

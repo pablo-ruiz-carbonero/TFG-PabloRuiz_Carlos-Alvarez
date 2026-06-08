@@ -27,6 +27,7 @@ __decorate([
     __metadata("design:type", String)
 ], CreateCropDto.prototype, "tipo_cultivo", void 0);
 __decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], CreateCropDto.prototype, "parcela_id", void 0);
@@ -143,7 +144,7 @@ __decorate([
 ], UpdateCropDto.prototype, "dias_fertilizacion", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsEnum)(['active', 'completed', 'archived']),
+    (0, class_validator_1.IsIn)(['active', 'completed', 'archived']),
     __metadata("design:type", String)
 ], UpdateCropDto.prototype, "status", void 0);
 //# sourceMappingURL=create-crop.dto.js.map

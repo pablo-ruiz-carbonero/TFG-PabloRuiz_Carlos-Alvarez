@@ -1,4 +1,6 @@
-import { IsString, IsNumber, IsOptional, IsDateString, IsEnum } from 'class-validator';
+// DTOs de cultivo. CreateCropDto recoge los datos iniciales de siembra; UpdateCropDto amplía
+// esos campos con fechas de seguimiento (último riego/fertilización) que se actualizan a lo largo del ciclo.
+import { IsString, IsNumber, IsOptional, IsDateString, IsEnum, IsIn } from 'class-validator';
 
 export class CreateCropDto {
   @IsString()
@@ -10,8 +12,9 @@ export class CreateCropDto {
   @IsString()
   tipo_cultivo: string;
 
+  @IsOptional()
   @IsNumber()
-  parcela_id: number;
+  parcela_id?: number;
 
   @IsNumber()
   superficie: number;
@@ -102,6 +105,6 @@ export class UpdateCropDto {
   dias_fertilizacion?: number;
 
   @IsOptional()
-  @IsEnum(['active', 'completed', 'archived'])
+  @IsIn(['active', 'completed', 'archived'])
   status?: string;
 }

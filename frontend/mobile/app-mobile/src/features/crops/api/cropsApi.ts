@@ -1,5 +1,6 @@
 // src/features/crops/api/cropsApi.ts
-// Capa de red pura — solo fetch, sin lógica de negocio
+// Capa de red para cultivos y parcelas. Convierte las respuestas del backend
+// al modelo de dominio del frontend mediante cropMappers.
 
 import {
   Crop,
@@ -71,6 +72,7 @@ export const updateCropRequest = async (
   cropId: string,
   dto: UpdateCropDto,
 ): Promise<Crop> => {
+  // Solo se incluyen los campos que realmente cambian (PATCH parcial)
   const body: any = {};
   if (dto.name) body.nombre = dto.name;
   if (dto.variety) body.variedad = dto.variety;

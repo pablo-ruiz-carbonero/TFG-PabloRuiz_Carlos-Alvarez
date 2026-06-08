@@ -1,3 +1,4 @@
+// Pagina de inicio de sesion: autenticacion del usuario y redireccion a la ruta solicitada previamente.
 import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -12,7 +13,7 @@ export const Login: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Where to redirect after login (default to /dashboard)
+  // Recuperar la ruta original a la que el usuario intentaba acceder antes de ser redirigido al login
   const from = (location.state as any)?.from?.pathname || '/dashboard';
 
   const handleSubmit = async (e: React.FormEvent) => {

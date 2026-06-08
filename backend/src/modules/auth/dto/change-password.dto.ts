@@ -1,0 +1,12 @@
+// DTO de cambio de contraseña. Requiere la contraseña actual para evitar cambios no autorizados
+// si un token JWT activo cayera en manos equivocadas.
+import { IsString, MinLength } from 'class-validator';
+
+export class ChangePasswordDto {
+  @IsString()
+  current_password: string;
+
+  @IsString()
+  @MinLength(6)
+  new_password: string;
+}

@@ -1,4 +1,6 @@
 // src/navigation/BottomNav.tsx
+// Barra de navegacion inferior con las cuatro secciones principales de la app:
+// Inicio, Cultivos, Mercado y Mensajes.
 
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -16,6 +18,7 @@ const Tab = createBottomTabNavigator();
 
 type IoniconName = React.ComponentProps<typeof Ionicons>["name"];
 
+// Pares [icono inactivo, icono activo] para cada pestaña
 const ICONS: Record<string, [IoniconName, IoniconName]> = {
   Home:        ["home-outline",       "home"],
   Crops:       ["leaf-outline",       "leaf"],

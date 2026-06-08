@@ -1,4 +1,6 @@
 // src/navigation/AppNavigator.tsx
+// Raíz de la navegación: muestra AuthStack si el usuario no está autenticado
+// o MainStack si ya hay una sesión activa. Muestra un spinner durante la carga inicial.
 
 import React from "react";
 import { View, ActivityIndicator } from "react-native";

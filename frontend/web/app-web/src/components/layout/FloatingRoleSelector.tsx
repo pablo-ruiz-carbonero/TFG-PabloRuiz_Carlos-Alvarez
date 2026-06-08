@@ -1,3 +1,4 @@
+// Selector flotante de rol para demostraciones: solo visible en modo mock para cambiar el rol activo en caliente.
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '../../types';
@@ -6,9 +7,9 @@ import { ShieldCheck } from 'lucide-react';
 export const FloatingRoleSelector: React.FC = () => {
   const { user, switchRole } = useAuth();
 
-  // Show only if mock mode is on and user is logged in
+  // Solo se renderiza en modo mock con sesion activa; en produccion no aparece
   const isMock = import.meta.env.VITE_USE_MOCK_API === 'true';
-  
+
   if (!isMock || !user) return null;
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

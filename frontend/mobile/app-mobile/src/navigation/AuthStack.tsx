@@ -1,4 +1,5 @@
 // src/navigation/AuthStack.tsx
+// Stack de navegación para usuarios no autenticados: Login y Registro.
 
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";

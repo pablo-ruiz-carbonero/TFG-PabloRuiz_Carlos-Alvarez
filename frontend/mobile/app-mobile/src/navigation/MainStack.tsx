@@ -1,4 +1,6 @@
 // src/navigation/MainStack.tsx
+// Stack principal para usuarios autenticados. Contiene la barra inferior (BottomNav)
+// como pantalla raíz y todas las pantallas de detalle accesibles sin cabecera.
 
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";

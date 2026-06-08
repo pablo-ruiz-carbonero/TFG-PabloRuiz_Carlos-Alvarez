@@ -1,5 +1,5 @@
 // src/features/crops/types/crops.types.ts
-// ✅ Fuente única de tipos — elimina src/types/crops.ts y src/types/tasks.ts
+// Modelos de dominio, enumeraciones y DTOs para cultivos, parcelas y tareas.
 
 // ─── Crops ────────────────────────────────────────────────────────────────────
 

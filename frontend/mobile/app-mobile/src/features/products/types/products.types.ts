@@ -1,5 +1,5 @@
 // src/features/products/types/products.types.ts
-// ✅ Fuente única — elimina src/types/products.ts
+// Modelos de dominio, enumeraciones y DTOs del marketplace de productos agrícolas.
 
 export type ProductCategory =
   | "Semillas"

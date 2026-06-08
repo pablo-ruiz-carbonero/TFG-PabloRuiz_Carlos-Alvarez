@@ -29,6 +29,7 @@ interface AuthContextType {
     email: string,
     password: string,
     telefono?: string,
+    rol?: string,
   ) => Promise<void>;
   logout: () => void;
 }
@@ -81,6 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     email: string,
     password: string,
     telefono?: string,
+    rol?: string,
   ) => {
     const { data } = await api.post<{ accessToken: string; user: User }>(
       "/auth/register",
@@ -89,6 +91,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         email,
         password,
         telefono,
+        rol,
       },
     );
     saveToken(data.accessToken);

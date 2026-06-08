@@ -1,3 +1,4 @@
+// Pagina de gestion de cultivos: lista, detalle, alta y registro de actividades agronomicas con graficos de consumo.
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { cropService } from '../services/cropService';
@@ -34,6 +35,7 @@ export const Crops: React.FC = () => {
   const [actQty, setActQty] = useState('');
   const [actUnit, setActUnit] = useState('L');
 
+  // Cargar cultivos al montar el componente
   useEffect(() => {
     loadCrops();
   }, []);
@@ -44,7 +46,7 @@ export const Crops: React.FC = () => {
     try {
       const data = await cropService.getCrops(user.id);
       setCrops(data);
-      // Update selected crop if it exists to refresh details
+      // Si habia un cultivo seleccionado, se actualiza su referencia con los datos frescos del servidor
       if (selectedCrop) {
         const updatedSelected = data.find(c => c.id === selectedCrop.id);
         if (updatedSelected) {
@@ -141,7 +143,7 @@ export const Crops: React.FC = () => {
     }
   };
 
-  // Set default units based on activity type
+  // Preselecciona la unidad mas habitual segun el tipo de actividad elegida en el formulario
   const handleActivityTypeChange = (type: ActivityType) => {
     setActType(type);
     if (type === 'irrigation') setActUnit('L');
@@ -150,7 +152,7 @@ export const Crops: React.FC = () => {
     else setActUnit('');
   };
 
-  // Recharts: Water usage chart
+  // Prepara los datos de consumo de agua agrupados por cultivo para el grafico de barras de Recharts
   const getIrrigationChartData = () => {
     return crops.map(c => {
       const waterTotal = c.activities

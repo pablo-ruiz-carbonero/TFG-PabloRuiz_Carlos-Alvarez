@@ -8,7 +8,7 @@ export class Task {
 
   @Column({
     type: 'enum',
-    enum: ['siembra', 'riego', 'fertilizacion', 'cosecha']
+    enum: ['siembra', 'riego', 'fertilizacion', 'cosecha', 'plaguicida'],
   })
   tipo: string;
 

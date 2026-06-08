@@ -1,6 +1,6 @@
 // src/features/chat/api/chatApi.ts
-// Capa REST pura — cuando el backend esté listo, quitar el mock de chatStorage
-// y descomentar los fetch. WebSocket se añade encima sin tocar esta capa.
+// Capa REST pura para conversaciones y mensajes del chat.
+// En modo mock, ChatContext llama a chatStorage en su lugar y no usa este módulo.
 
 import { ChatConversation, ChatMessage, CreateConversationDto } from "../types/chat.types";
 import { getToken } from "../../auth/utils/tokenStorage";

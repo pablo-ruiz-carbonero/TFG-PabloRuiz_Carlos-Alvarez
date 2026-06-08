@@ -396,12 +396,9 @@ export default function DetailCropScreen() {
         {/* Watering */}
         <Section
           title="Riego"
+          accentColor="#0ea5e9"
           titleIcon={
-            <MaterialIcons
-              name="water-drop"
-              size={16}
-              color={colors.textSecond}
-            />
+            <MaterialIcons name="water-drop" size={16} color="#0ea5e9" />
           }
         >
           <View style={styles.infoRow}>
@@ -436,11 +433,12 @@ export default function DetailCropScreen() {
         {/* Fertilization */}
         <Section
           title="Fertilización"
+          accentColor="#16a34a"
           titleIcon={
             <MaterialCommunityIcons
               name="flask-outline"
               size={16}
-              color={colors.textSecond}
+              color="#16a34a"
             />
           }
         >
@@ -596,15 +594,23 @@ function Section({
   title,
   titleIcon,
   action,
+  accentColor,
   children,
 }: {
   title: string;
   titleIcon?: React.ReactNode;
   action?: React.ReactNode;
+  accentColor?: string;
   children: React.ReactNode;
 }) {
   return (
-    <View style={[shared.card, styles.section]}>
+    <View
+      style={[
+        shared.card,
+        styles.section,
+        accentColor && { borderLeftWidth: 3, borderLeftColor: accentColor },
+      ]}
+    >
       <View style={styles.sectionHeader}>
         <View style={styles.sectionTitleRow}>
           {titleIcon}
@@ -612,6 +618,7 @@ function Section({
             style={[
               shared.sectionTitle,
               { marginLeft: titleIcon ? spacing.xs : 0 },
+              accentColor && { color: accentColor },
             ]}
           >
             {title}
@@ -992,14 +999,15 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.45)",
-    justifyContent: "flex-end",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: spacing.lg,
   },
   modalCard: {
     backgroundColor: colors.surface,
-    borderTopLeftRadius: radius.xl,
-    borderTopRightRadius: radius.xl,
+    borderRadius: radius.xl,
     padding: spacing.xl,
-    paddingBottom: spacing.xxxl,
+    width: "100%",
   },
   modalTitle: {
     fontSize: font.lg,

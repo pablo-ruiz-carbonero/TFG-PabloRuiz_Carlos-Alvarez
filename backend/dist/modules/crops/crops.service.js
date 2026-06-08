@@ -17,24 +17,32 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const crop_entity_1 = require("../../database/entities/crop.entity");
+const parcela_entity_1 = require("../../database/entities/parcela.entity");
 let CropsService = class CropsService {
-    constructor(cropRepository) {
+    constructor(cropRepository, parcelaRepository) {
         this.cropRepository = cropRepository;
+        this.parcelaRepository = parcelaRepository;
     }
     async findAll(userId) {
-        return this.cropRepository.find({
-            where: { usuario: { id: userId } },
-            relations: ['usuario'],
-        });
+        const rows = await this.cropRepository
+            .createQueryBuilder('crop')
+            .leftJoinAndSelect('crop.usuario', 'usuario')
+            .leftJoinAndSelect('crop.tareas', 'tareas')
+            .leftJoinAndSelect('crop.parcela', 'parcela')
+            .where('usuario.id = :userId', { userId })
+            .getMany();
+        return rows;
     }
     async findOne(id, userId) {
-        const crop = await this.cropRepository.findOne({
-            where: { id, usuario: { id: userId } },
-            relations: ['usuario'],
-        });
-        if (!crop) {
+        const crop = await this.cropRepository
+            .createQueryBuilder('crop')
+            .leftJoinAndSelect('crop.usuario', 'usuario')
+            .leftJoinAndSelect('crop.tareas', 'tareas')
+            .leftJoinAndSelect('crop.parcela', 'parcela')
+            .where('crop.id = :id AND usuario.id = :userId', { id, userId })
+            .getOne();
+        if (!crop)
             throw new common_1.NotFoundException('Cultivo no encontrado');
-        }
         return crop;
     }
     async create(createCropDto, userId) {
@@ -54,17 +62,24 @@ let CropsService = class CropsService {
         await this.cropRepository.remove(crop);
     }
     async getParcels(userId) {
-        return [
-            { id: 1, nombre: 'Parcela A1', ubicacion: 'Zona Norte', tamano: 1.2 },
-            { id: 2, nombre: 'Parcela B1', ubicacion: 'Zona Sur', tamano: 0.8 },
-            { id: 3, nombre: 'Parcela C1', ubicacion: 'Zona Este', tamano: 1.5 },
-        ];
+        return this.parcelaRepository.find({
+            where: { usuario: { id: userId } },
+        });
+    }
+    async createParcel(userId, data) {
+        const parcela = this.parcelaRepository.create({
+            ...data,
+            usuario: { id: userId },
+        });
+        return this.parcelaRepository.save(parcela);
     }
 };
 exports.CropsService = CropsService;
 exports.CropsService = CropsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(crop_entity_1.Crop)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __param(1, (0, typeorm_1.InjectRepository)(parcela_entity_1.Parcela)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository])
 ], CropsService);
 //# sourceMappingURL=crops.service.js.map

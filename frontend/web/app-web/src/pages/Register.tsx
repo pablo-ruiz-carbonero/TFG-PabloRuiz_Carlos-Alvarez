@@ -1,3 +1,4 @@
+// Pagina de registro: creacion de nuevas cuentas con seleccion de rol e inicio de sesion automatico.
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -22,6 +23,7 @@ export const Register: React.FC = () => {
       return;
     }
 
+    // Validacion de longitud minima antes de llamar al servicio
     if (password.length < 6) {
       setError('La contraseña debe tener al menos 6 caracteres.');
       return;
@@ -117,6 +119,7 @@ export const Register: React.FC = () => {
                 <option value="farmer">Agricultor (Gestión y Venta)</option>
                 <option value="distributor">Distribuidor (Compra y Contratación)</option>
                 <option value="supplier">Proveedor (Venta de Insumos)</option>
+                <option value="admin">Administrador</option>
               </select>
             </div>
             <div className="form-group">

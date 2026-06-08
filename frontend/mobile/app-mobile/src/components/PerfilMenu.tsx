@@ -1,4 +1,6 @@
 // src/components/PerfilMenu.tsx
+// Botón de avatar circular que muestra las iniciales del usuario autenticado
+// y navega a la pantalla de perfil al pulsarlo.
 
 import React from "react";
 import {

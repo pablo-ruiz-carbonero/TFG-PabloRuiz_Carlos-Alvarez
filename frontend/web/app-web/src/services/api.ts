@@ -1,12 +1,16 @@
+// Cliente HTTP centralizado que añade el token JWT a cada petición y gestiona errores globales.
+
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 interface RequestOptions extends RequestInit {
   data?: any;
 }
 
+// Función interna que construye y ejecuta cada petición HTTP
 async function request(endpoint: string, { method, data, headers, ...customOptions }: RequestOptions = {}) {
+  // Leer el token en cada llamada para reflejar cambios de sesión en caliente
   const token = localStorage.getItem('agro_token');
-  
+
   const defaultHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
   };
@@ -16,6 +20,7 @@ async function request(endpoint: string, { method, data, headers, ...customOptio
   }
 
   const config: RequestInit = {
+    // Si no se especifica método, se infiere: POST cuando hay body, GET en caso contrario
     method: method || (data ? 'POST' : 'GET'),
     headers: {
       ...defaultHeaders,
@@ -28,11 +33,13 @@ async function request(endpoint: string, { method, data, headers, ...customOptio
     config.body = JSON.stringify(data);
   }
 
+  // Normalizar la URL eliminando barras duplicadas entre BASE_URL y el endpoint
   const url = `${BASE_URL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
 
   try {
     const response = await fetch(url, config);
-    
+
+    // Cierre de sesión global ante token expirado o inválido
     if (response.status === 401) {
       localStorage.removeItem('agro_token');
       localStorage.removeItem('agro_user');

@@ -1,4 +1,5 @@
 // src/features/auth/utils/tokenStorage.ts
+// Utilidades para persistir y recuperar el token JWT en AsyncStorage.
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 

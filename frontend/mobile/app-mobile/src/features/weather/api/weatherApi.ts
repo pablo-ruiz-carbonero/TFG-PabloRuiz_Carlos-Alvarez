@@ -1,5 +1,6 @@
 // src/features/weather/api/weatherApi.ts
-// Capa de red pura — solo fetch contra OpenWeatherMap, sin lógica de negocio
+// Capa de red contra la API OpenWeatherMap (clima actual + previsión 5 días).
+// Expone funciones por ciudad y por coordenadas GPS, y aplica el mapper al retornar.
 
 import { mapWeatherData } from "../utils/weatherMappers";
 import { WeatherData } from "../types/weather.types";
@@ -55,6 +56,7 @@ const fetchForecastByCoords = async (
 
 // ─── API pública (retorna modelos de dominio) ─────────────────────────────────
 
+// Lanza ambas peticiones en paralelo para reducir la latencia total
 export const getWeatherByCityRequest = async (
   city: string,
 ): Promise<WeatherData> => {

@@ -1,4 +1,6 @@
 // src/features/crops/context/CropsContext.tsx
+// Contexto global de cultivos y tareas agrícolas. Mantiene el estado de cultivos,
+// parcelas y tareas en memoria, con soporte para modo mock en desarrollo.
 
 import React, { createContext, useState, useCallback } from "react";
 import {
@@ -166,6 +168,8 @@ export const CropsProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Helper que envuelve cualquier operación asíncrona con manejo de
+  // estado de carga y error centralizado
   const run = async <T,>(fn: () => Promise<T>): Promise<T> => {
     setError(null);
     setLoading(true);
@@ -184,6 +188,7 @@ export const CropsProvider: React.FC<{ children: React.ReactNode }> = ({
     await run(async () => {
       if (isDev()) {
         await new Promise((r) => setTimeout(r, 300));
+        // Merge: evita sobreescribir cultivos creados optimistamente durante la sesión
         setCrops((prev) => {
           const prevIds = new Set(prev.map((c) => c.id));
           const newMocks = DEV_CROPS.filter((c) => !prevIds.has(c.id));
@@ -209,6 +214,7 @@ export const CropsProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const getCropById = async (id: string): Promise<Crop> => {
+    // Primero busca en el estado local para evitar peticiones innecesarias
     const local = crops.find((c) => c.id === id);
     if (local) return local;
     if (isDev()) {

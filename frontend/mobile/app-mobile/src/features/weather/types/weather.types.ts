@@ -1,5 +1,5 @@
 // src/features/weather/types/weather.types.ts
-// ✅ Fuente única de tipos para la feature Weather
+// Modelos de dominio, DTOs y estado del contexto para la feature de clima.
 
 // ─── Modelos de dominio ───────────────────────────────────────────────────────
 

@@ -1,4 +1,5 @@
 // src/features/auth/hooks/useAuth.ts
+// Acceso tipado al AuthContext. Lanza un error si se usa fuera del provider.
 
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";

@@ -1,14 +1,7 @@
-import {
-  IsEmail,
-  IsString,
-  IsOptional,
-  MinLength,
-  MaxLength,
-} from "class-validator";
+// DTO de registro de usuario. Valida los campos requeridos y los opcionales antes de llegar al servicio.
+import { IsEmail, IsString, IsOptional, IsEnum, MinLength, MaxLength } from "class-validator";
 
 export class RegisterDto {
-  // FIX: el campo se llama "nombre" (igual que la entidad User)
-  //    antes el mobile enviaba "name" → el backend lo ignoraba → usuario sin nombre
   @IsString()
   @IsOptional()
   @MaxLength(100)
@@ -17,6 +10,7 @@ export class RegisterDto {
   @IsEmail()
   email: string;
 
+  // Mínimo 6 caracteres para garantizar una contraseña básica
   @IsString()
   @MinLength(6)
   password: string;
@@ -25,4 +19,9 @@ export class RegisterDto {
   @IsOptional()
   @MaxLength(20)
   telefono?: string;
+
+  // Si no se especifica, el servicio asigna "agricultor" por defecto
+  @IsEnum(["agricultor", "distribuidor", "proveedor", "administrador"])
+  @IsOptional()
+  rol?: string;
 }

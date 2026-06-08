@@ -12,7 +12,7 @@ CREATE TABLE
         nombre VARCHAR(100),
         email VARCHAR(100) UNIQUE,
         password VARCHAR(255),
-        telefono VARCHAR(20), -- columna añadida
+        telefono VARCHAR(20),
         rol_id INT,
         fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (rol_id) REFERENCES roles (id)
@@ -25,6 +25,7 @@ CREATE TABLE
         usuario_id INT,
         nombre VARCHAR(100),
         ubicacion VARCHAR(255),
+        tamano DECIMAL(10, 2),
         FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
     );
 
@@ -86,21 +87,39 @@ CREATE TABLE
         id INT AUTO_INCREMENT PRIMARY KEY,
         usuario_id INT,
         nombre VARCHAR(100),
+        categoria VARCHAR(50),
         descripcion TEXT,
-        cantidad DECIMAL(10, 2),
         precio DECIMAL(10, 2),
+        unidad VARCHAR(20),
+        stock INT NOT NULL DEFAULT 0,
+        provincia VARCHAR(100),
         fecha_publicacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
+    );
+
+-- CONVERSACIONES (agrupa mensajes entre dos usuarios)
+CREATE TABLE
+    conversaciones (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        usuario_a_id INT NOT NULL,
+        usuario_b_id INT NOT NULL,
+        leido_a TINYINT(1) NOT NULL DEFAULT 0,
+        leido_b TINYINT(1) NOT NULL DEFAULT 0,
+        fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_participantes (usuario_a_id, usuario_b_id),
+        FOREIGN KEY (usuario_a_id) REFERENCES usuarios (id),
+        FOREIGN KEY (usuario_b_id) REFERENCES usuarios (id)
     );
 
 -- MENSAJES
 CREATE TABLE
     mensajes (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        emisor_id INT,
-        receptor_id INT,
-        contenido TEXT,
+        conversacion_id INT NOT NULL,
+        emisor_id INT NOT NULL,
+        contenido TEXT NOT NULL,
+        leido TINYINT(1) NOT NULL DEFAULT 0,
         fecha_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (emisor_id) REFERENCES usuarios (id),
-        FOREIGN KEY (receptor_id) REFERENCES usuarios (id)
+        FOREIGN KEY (conversacion_id) REFERENCES conversaciones (id) ON DELETE CASCADE,
+        FOREIGN KEY (emisor_id) REFERENCES usuarios (id)
     );

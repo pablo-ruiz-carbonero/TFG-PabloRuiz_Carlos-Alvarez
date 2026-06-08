@@ -1,4 +1,6 @@
 // src/features/auth/api/authApi.ts
+// Capa de red pura para autenticación: login, registro, perfil y contraseña.
+// Todos los endpoints requieren el token JWT salvo login y register.
 
 import {
   LoginDto,

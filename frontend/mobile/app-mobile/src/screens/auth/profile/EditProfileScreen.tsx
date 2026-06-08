@@ -166,10 +166,11 @@ export default function EditProfileScreen() {
               <TextInput
                 style={styles.input}
                 value={phone}
-                onChangeText={setPhone}
                 placeholder="+34 600 000 000"
                 placeholderTextColor={colors.textMuted}
                 keyboardType="phone-pad"
+                maxLength={15}
+                onChangeText={(v) => setPhone(v.replace(/[^0-9+\s\-]/g, ""))}
                 onFocus={() => onFocus(phoneRef)}
               />
             </View>

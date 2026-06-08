@@ -1,3 +1,4 @@
+// Marketplace agricola: catalogo de productos con filtros, favoritos, publicacion y contacto con el vendedor.
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { marketService } from '../services/marketService';
@@ -32,7 +33,7 @@ const IMAGE_PRESETS = [
   { name: 'Patatas', url: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&q=80&w=600' },
 ];
 
-// Helper to resize and compress device images for lightweight localStorage storage
+// Redimensiona y comprime imagenes del dispositivo a JPEG 70% para reducir el peso en localStorage
 const resizeImage = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -116,7 +117,7 @@ export const Marketplace: React.FC = () => {
   const [uploadingFile, setUploadingFile] = useState(false);
   const [activeImgIndex, setActiveImgIndex] = useState(0);
 
-  // Load products and favorites on mount
+  // Al montar: cargar productos del catalogo y restaurar favoritos guardados localmente
   useEffect(() => {
     loadProducts();
     const storedFavs = localStorage.getItem('agro_favorites');
@@ -129,7 +130,7 @@ export const Marketplace: React.FC = () => {
     }
   }, []);
 
-  // Reset active image index when product details open/change
+  // Reiniciar el carrusel de imagenes al abrir un producto diferente
   useEffect(() => {
     setActiveImgIndex(0);
   }, [selectedProduct]);
@@ -146,13 +147,15 @@ export const Marketplace: React.FC = () => {
     }
   };
 
+  // Muestra un toast de confirmacion durante 4 segundos
   const triggerAlert = (text: string, type: 'success' | 'danger' = 'success') => {
     setAlertMsg({ text, type });
     setTimeout(() => setAlertMsg(null), 4000);
   };
 
-  // Toggle Favorite
+  // Alterna el estado de favorito de un producto y persiste la lista en localStorage
   const toggleFavorite = (productId: string, e?: React.MouseEvent) => {
+    // Detener la propagacion para que no se abra el modal del producto al pulsar el corazon
     if (e) {
       e.stopPropagation();
     }
@@ -233,7 +236,7 @@ export const Marketplace: React.FC = () => {
     }
   };
 
-  // Start chat with seller
+  // Inicia una conversacion con el vendedor y navega a Mensajeria pasando el id del participante como estado de ruta
   const handleContactSeller = async (sellerId: string, sellerName: string, productTitle: string) => {
     if (!user) {
       navigate('/login');
@@ -257,7 +260,7 @@ export const Marketplace: React.FC = () => {
     alert(`Contacto de ${sellerName.split(' (')[0]}:\n📞 Teléfono: +34 688 ${Math.floor(100 + Math.random() * 900)} ${Math.floor(100 + Math.random() * 900)}\nHorario recomendado: 08:00 a 18:00`);
   };
 
-  // Filter & Sort Logic
+  // Aplicar todos los filtros activos (busqueda, categoria, precio, ubicacion y favoritos) de forma combinada
   const filteredProducts = products.filter(p => {
     const matchesSearch = p.title.toLowerCase().includes(search.toLowerCase()) || 
                           p.description.toLowerCase().includes(search.toLowerCase());
@@ -270,7 +273,7 @@ export const Marketplace: React.FC = () => {
     return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice && matchesLocation && matchesFav;
   });
 
-  // Apply sorting
+  // Ordenar sobre una copia para no mutar el array filtrado
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (sortBy === 'priceAsc') {
       return a.price - b.price;
@@ -302,7 +305,7 @@ export const Marketplace: React.FC = () => {
     return classes[cat] || 'badge-secondary';
   };
 
-  // Generate pseudo ratings for sellers
+  // Genera una puntuacion pseudo-aleatoria pero determinista para el vendedor basada en su ID
   const getSellerRating = (sellerId: string) => {
     const sum = sellerId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     const score = (4.0 + (sum % 11) * 0.1).toFixed(1);
@@ -310,7 +313,7 @@ export const Marketplace: React.FC = () => {
     return { score, reviewsCount };
   };
 
-  // Related products (same category, different product id)
+  // Productos de la misma categoria para mostrar en el panel de detalle (maximo 3)
   const relatedProducts = selectedProduct 
     ? products
         .filter(p => p.category === selectedProduct.category && p.id !== selectedProduct.id)

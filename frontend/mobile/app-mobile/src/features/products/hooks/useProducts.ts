@@ -1,4 +1,5 @@
 // src/features/products/hooks/useProducts.ts
+// Acceso tipado al ProductsContext. Lanza un error si se usa fuera del provider.
 
 import { useContext } from "react";
 import { ProductsContext } from "../context/ProductsContext";

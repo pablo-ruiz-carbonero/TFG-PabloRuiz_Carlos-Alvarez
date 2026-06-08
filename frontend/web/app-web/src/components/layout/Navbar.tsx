@@ -1,3 +1,4 @@
+// Barra de navegacion superior: controla el tema claro/oscuro, muestra el usuario activo y el boton de logout.
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { LogOut, Sun, Moon, Sprout, Menu } from 'lucide-react';
@@ -13,11 +14,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState<boolean>(false);
 
+  // Al montar el componente se sincroniza el estado del tema con la preferencia guardada o la del sistema
   useEffect(() => {
-    // Check initial theme
     const theme = localStorage.getItem('theme');
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
+
     if (theme === 'dark' || (!theme && systemPrefersDark)) {
       document.documentElement.classList.add('dark');
       setIsDark(true);
@@ -27,6 +28,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
     }
   }, []);
 
+  // Alterna entre tema claro y oscuro actualizando la clase del elemento raiz y persistiendo la preferencia
   const toggleTheme = () => {
     if (document.documentElement.classList.contains('dark')) {
       document.documentElement.classList.remove('dark');
@@ -39,6 +41,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
     }
   };
 
+  // Extrae hasta dos iniciales del nombre para el avatar del usuario
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -48,6 +51,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
       .toUpperCase();
   };
 
+  // Devuelve la etiqueta en castellano del rol para mostrarla en la interfaz
   const getRoleLabel = (role: UserRole) => {
     const roles: Record<UserRole, string> = {
       farmer: 'Agricultor',
@@ -86,6 +90,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
               <div className="user-avatar" title={user.name}>
                 {getInitials(user.name)}
               </div>
+              {/* Nombre y rol se ocultan en movil mediante CSS; el cast evita el error de TS con la prop 'md' */}
               <div className="user-info-text" style={{ display: 'none', md: 'flex' } as any}>
                 <span className="user-name">{user.name.split(' (')[0]}</span>
                 <span className="user-role-label">{getRoleLabel(user.role)}</span>

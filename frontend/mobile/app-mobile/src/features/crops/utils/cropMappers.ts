@@ -1,5 +1,6 @@
 // src/features/crops/utils/cropMappers.ts
-// Transforma las respuestas del backend (snake_case español) al modelo del frontend
+// Transforma las respuestas del backend (snake_case en español) a los modelos
+// de dominio del frontend (camelCase en inglés).
 
 import { Crop, Task, Parcel } from "../types/crops.types";
 
@@ -14,6 +15,7 @@ export const mapCrop = (raw: any): Crop => ({
   seedDate: raw.fecha_siembra,
   currentPhase: raw.fase_actual ?? "Plántula",
   expectedHarvest: raw.fecha_cosecha_esperada,
+  // Calcula la edad en días a partir de la fecha de siembra
   daysOld: Math.floor(
     (Date.now() - new Date(raw.fecha_siembra).getTime()) / 86_400_000,
   ),

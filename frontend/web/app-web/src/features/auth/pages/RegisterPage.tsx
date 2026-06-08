@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const [telefono, setTelefono] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rol, setRol] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -25,7 +26,7 @@ export default function RegisterPage() {
     try {
       // FIX: usamos AuthContext.register que guarda el token automáticamente
       //    y navega al dashboard sin pasar por /login de nuevo
-      await register(nombre, email, password, telefono || undefined);
+      await register(nombre, email, password, telefono || undefined, rol);
       navigate("/");
     } catch (err: any) {
       const msg =
@@ -71,6 +72,13 @@ export default function RegisterPage() {
             required
             minLength={6}
           />
+          <select value={rol} onChange={(e) => setRol(e.target.value)} required>
+            <option value="" disabled>Tipo de usuario</option>
+            <option value="agricultor">Agricultor</option>
+            <option value="distribuidor">Distribuidor</option>
+            <option value="proveedor">Proveedor</option>
+            <option value="administrador">Administrador</option>
+          </select>
           <button type="submit" disabled={loading}>
             {loading ? "Creando cuenta..." : "Crear cuenta"}
           </button>
