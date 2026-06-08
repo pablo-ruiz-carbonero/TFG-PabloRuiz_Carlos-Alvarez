@@ -1,3 +1,6 @@
+// src/components/Divider.tsx
+// Separador horizontal decorativo reutilizable entre secciones de formulario.
+
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { colors, spacing } from "../styles/Globaltheme";

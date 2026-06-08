@@ -35,4 +35,9 @@ __decorate([
     (0, class_validator_1.MaxLength)(20),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "telefono", void 0);
+__decorate([
+    (0, class_validator_1.IsEnum)(["agricultor", "distribuidor", "proveedor", "administrador"]),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "rol", void 0);
 //# sourceMappingURL=register.dto.js.map

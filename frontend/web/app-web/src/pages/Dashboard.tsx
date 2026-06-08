@@ -1,3 +1,4 @@
+// Panel principal del usuario: muestra metricas clave, el widget meteorologico y las tareas o novedades segun el rol.
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { weatherService } from '../services/weatherService';
@@ -30,12 +31,13 @@ export const Dashboard: React.FC = () => {
   const [chatsCount, setChatsCount] = useState(0);
   const [loadingStats, setLoadingStats] = useState(true);
 
-  // Load weather when region or coordinates change
+  // Se vuelve a pedir el tiempo cada vez que cambia la region seleccionada o las coordenadas GPS
   useEffect(() => {
     const fetchWeather = async () => {
       setWeatherLoading(true);
       try {
         let data;
+        // Si hay coordenadas GPS se usan para mayor precision; si no, se busca por nombre de ciudad
         if (coordinates) {
           data = await weatherService.getWeather(region, coordinates.lat, coordinates.lon);
         } else {
@@ -51,6 +53,7 @@ export const Dashboard: React.FC = () => {
     fetchWeather();
   }, [region, coordinates]);
 
+  // Solicita la posicion GPS del usuario; si falla o no hay permiso, muestra Zaragoza como fallback
   const handleGeolocate = () => {
     setGpsError(null);
     if (!navigator.geolocation) {
@@ -70,9 +73,10 @@ export const Dashboard: React.FC = () => {
       },
       (error) => {
         console.error('Error getting location, using Zaragoza fallback:', error);
+        // Fallback geografico: Zaragoza (zona agricola central de España)
         setCoordinates({ lat: 41.6488, lon: -0.8891 });
         setRegion('Zaragoza, Aragón (Estimado)');
-        
+
         let message = 'No se pudo acceder a tu GPS (tiempo de espera agotado). Mostrando Zaragoza.';
         if (error.code === error.PERMISSION_DENIED) {
           message = 'Permiso de ubicación denegado. Actívalo en tu navegador o escribe tu ciudad.';
@@ -81,12 +85,13 @@ export const Dashboard: React.FC = () => {
       },
       {
         enableHighAccuracy: false,
-        timeout: 4500, // Wait up to 4.5 seconds before falling back
+        timeout: 4500, // tiempo maximo de espera antes de usar el fallback
         maximumAge: 0
       }
     );
   };
 
+  // Al buscar por nombre de ciudad se limpian las coordenadas GPS para forzar la busqueda por nombre
   const handleSearchCitySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchCity.trim()) return;
@@ -95,28 +100,24 @@ export const Dashboard: React.FC = () => {
     setSearchCity('');
   };
 
-  // Load stats
+  // Carga las metricas del dashboard cuando el usuario cambia (incluso al cambiar de rol en demo)
   useEffect(() => {
     if (!user) return;
     const fetchStats = async () => {
       setLoadingStats(true);
       try {
-        // Fetch all products
         const products = await marketService.getProducts();
-        
-        // Fetch chats
         const chats = await chatService.getChats(user.id);
         setChatsCount(chats.length);
 
         if (user.role === 'farmer' || user.role === 'admin') {
           const farmerCrops = await cropService.getCrops(user.id);
           setCrops(farmerCrops);
-          
-          // Count only user's products
+          // Solo se contabilizan los productos publicados por el propio usuario
           const myProducts = products.filter(p => p.sellerId === user.id);
           setProductsCount(myProducts.length);
         } else {
-          // Distributors/Suppliers count their own products
+          // Distribuidores y proveedores tambien pueden publicar productos
           const myProducts = products.filter(p => p.sellerId === user.id);
           setProductsCount(myProducts.length);
         }
@@ -129,19 +130,19 @@ export const Dashboard: React.FC = () => {
     fetchStats();
   }, [user]);
 
-  // Calculate upcoming tasks for Farmers
+  // Genera alertas de tareas pendientes basadas en el historial de actividades de cada cultivo activo
   const getUpcomingTasks = () => {
     if (crops.length === 0) return [];
-    
+
     const tasks: { id: string; cropName: string; type: string; details: string; date: string; priority: 'high' | 'medium' | 'low' }[] = [];
-    
+
     crops.forEach(crop => {
       if (crop.status === 'growing') {
-        // Find last activities
+        // Buscar el riego mas reciente para calcular los dias transcurridos
         const lastIrrigation = crop.activities.filter(a => a.type === 'irrigation').sort((a,b) => b.date.localeCompare(a.date))[0];
-        
-        // Simulating recommendation: if last irrigation was > 4 days ago
-        const daysSinceIrrigation = lastIrrigation 
+
+        // 99 significa que nunca se ha registrado un riego
+        const daysSinceIrrigation = lastIrrigation
           ? Math.floor((Date.now() - new Date(lastIrrigation.date).getTime()) / (1000 * 60 * 60 * 24))
           : 99;
 
@@ -156,9 +157,9 @@ export const Dashboard: React.FC = () => {
           });
         }
 
-        // Fertilization recommendations
+        // Alerta si no se ha fertilizado en el ultimo mes
         const lastFertilization = crop.activities.filter(a => a.type === 'fertilization').sort((a,b) => b.date.localeCompare(a.date))[0];
-        const daysSinceFert = lastFertilization 
+        const daysSinceFert = lastFertilization
           ? Math.floor((Date.now() - new Date(lastFertilization.date).getTime()) / (1000 * 60 * 60 * 24))
           : 99;
 
@@ -178,7 +179,7 @@ export const Dashboard: React.FC = () => {
     return tasks;
   };
 
-  // Weather-based agricultural advice
+  // Genera un consejo agronomico adaptado a las condiciones meteorologicas actuales
   const getAgriculturalAdvice = (w: WeatherData) => {
     if (w.temp > 30) {
       return {
@@ -207,7 +208,7 @@ export const Dashboard: React.FC = () => {
   const upcomingTasks = getUpcomingTasks();
   const weatherAdvice = weather ? getAgriculturalAdvice(weather) : null;
 
-  // Formatting chart data
+  // Transformar el pronostico al formato que espera Recharts para el grafico de area
   const chartData = weather?.forecast.map(f => ({
     fecha: new Date(f.date).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' }),
     temp: f.temp

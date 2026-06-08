@@ -1,4 +1,6 @@
 // src/features/weather/context/WeatherContext.tsx
+// Contexto global del clima: almacena el resultado de la última consulta a
+// OpenWeatherMap y expone métodos de búsqueda por ciudad o coordenadas GPS.
 
 import React, { createContext, useState, useCallback } from 'react';
 import { WeatherData, WeatherContextState } from '../types/weather.types';
@@ -34,6 +36,7 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
       setWeatherData(data);
       setCurrentCity(data.current.city);
     } catch (err: any) {
+      // OWM devuelve "city not found" como mensaje literal cuando la ciudad no existe
       const msg: string =
         err?.message === 'city not found'
           ? 'Ciudad no encontrada. Comprueba el nombre.'

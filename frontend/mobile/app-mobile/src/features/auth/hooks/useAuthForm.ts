@@ -1,4 +1,6 @@
 // src/features/auth/hooks/useAuthForm.ts
+// Hook genérico para formularios de autenticación: gestiona el estado
+// de carga y el mensaje de error resultante de una operación asíncrona.
 
 import { useState } from "react";
 

@@ -1,4 +1,5 @@
 // src/features/products/hooks/useProductDetail.ts
+// Hook que gestiona la carga y eliminación de un producto concreto del marketplace.
 
 import { useState, useCallback } from "react";
 import { Product } from "../types/products.types";

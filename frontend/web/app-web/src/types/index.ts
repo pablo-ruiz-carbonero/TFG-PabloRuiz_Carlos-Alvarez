@@ -1,5 +1,9 @@
+// Definiciones de tipos e interfaces compartidas en toda la aplicación AgroLink.
+
+// Roles de usuario disponibles en la plataforma
 export type UserRole = 'farmer' | 'distributor' | 'supplier' | 'admin';
 
+// Representa al usuario autenticado en la sesión
 export interface User {
   id: string;
   name: string;
@@ -9,10 +13,13 @@ export interface User {
   token?: string;
 }
 
+// Estados posibles del ciclo de vida de un cultivo
 export type CropStatus = 'growing' | 'harvested' | 'failed';
 
+// Tipos de labor agrícola que se pueden registrar en un cultivo
 export type ActivityType = 'irrigation' | 'fertilization' | 'harvest' | 'pest';
 
+// Registro de una labor agrícola asociada a un cultivo concreto
 export interface Activity {
   id: string;
   cropId: string;
@@ -23,20 +30,23 @@ export interface Activity {
   unit?: string;
 }
 
+// Cultivo registrado por un agricultor, con su historial de actividades
 export interface Crop {
   id: string;
   name: string;
   variety: string;
   soilType: string;
-  area: number; // in hectares
+  area: number; // en hectáreas
   plantingDate: string;
   status: CropStatus;
   farmerId: string;
   activities: Activity[];
 }
 
+// Categorías de productos disponibles en el marketplace
 export type ProductCategory = 'seeds' | 'machinery' | 'crops' | 'inputs';
 
+// Anuncio publicado en el marketplace agrícola
 export interface Product {
   id: string;
   title: string;
@@ -46,7 +56,7 @@ export interface Product {
   image?: string;
   images?: string[];
   stock: number;
-  unit: string; // e.g., "kg", "unidades", "sacos", "toneladas"
+  unit: string; // p.ej. "kg", "unidades", "sacos", "toneladas"
   location: string;
   sellerId: string;
   sellerName: string;
@@ -54,6 +64,7 @@ export interface Product {
   createdAt: string;
 }
 
+// Mensaje individual dentro de una conversación entre dos usuarios
 export interface Message {
   id: string;
   senderId: string;
@@ -65,6 +76,7 @@ export interface Message {
   read: boolean;
 }
 
+// Conversación entre el usuario actual y otro participante
 export interface Chat {
   id: string;
   participantId: string;
@@ -74,6 +86,7 @@ export interface Chat {
   lastMessage?: Message;
 }
 
+// Datos meteorológicos actuales y pronóstico de 5 días para una localización
 export interface WeatherData {
   temp: number;
   tempMin: number;

@@ -1,3 +1,4 @@
+// Contexto global de autenticacion: proporciona el usuario activo y las funciones de sesion a toda la app.
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, UserRole } from '../types';
 import { authService } from '../services/authService';
@@ -19,6 +20,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Al montar el proveedor, se recupera la sesion guardada y se suscribe al evento global de cierre de sesion
   useEffect(() => {
     const initializeAuth = async () => {
       const token = localStorage.getItem('agro_token');
@@ -26,6 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (token && cachedUser) {
         try {
+          // Restaurar usuario desde cache sin necesidad de una peticion al backend
           setUser(JSON.parse(cachedUser));
         } catch (e) {
           console.error('Error parsing cached user', e);
@@ -38,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     initializeAuth();
 
-    // Listen to global logout events (e.g. 401 responses)
+    // Escuchar el evento 'auth_logout' que emite api.ts al recibir un 401
     const handleLogoutEvent = () => {
       logout();
     };
@@ -85,11 +88,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('agro_user');
   };
 
-  // Facilitates testing roles in TFG presentations without re-registering
+  // Permite cambiar el rol activo en tiempo real para demostraciones del TFG sin necesidad de re-registrarse
   const switchRole = (role: UserRole) => {
     if (!user) return;
-    
-    // In mock mode we can update the user directly
+
+    // Se añade el rol entre paréntesis al nombre para indicar visualmente el rol activo en la demo
     const updatedUser: User = {
       ...user,
       name: `${user.name.split(' (')[0]} (${role.charAt(0).toUpperCase() + role.slice(1)})`,
@@ -98,13 +101,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(updatedUser);
     localStorage.setItem('agro_user', JSON.stringify(updatedUser));
 
-    // Update in local DB if user exists there
+    // En modo mock también se actualiza la base de datos local para que el cambio persista
     if (import.meta.env.VITE_USE_MOCK_API === 'true') {
       const db = dbService.getUsers();
       const userInDb = db.find(u => u.id === user.id);
       if (userInDb) {
         userInDb.role = role;
-        // Save back (mockDb works on internal save)
         const fullDb = JSON.parse(localStorage.getItem('agro_db') || '{}');
         fullDb.users = fullDb.users.map((u: any) => u.id === user.id ? { ...u, role } : u);
         localStorage.setItem('agro_db', JSON.stringify(fullDb));
@@ -117,7 +119,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     try {
       const updated = await authService.updateProfile(user.id, name, phone, password);
-      // Retain the current presentation role/name formatting if role-switching was active
+      // Si el rol de demo estaba activo (nombre con paréntesis), se conserva el formato visual
       const finalUser = {
         ...updated,
         role: user.role,
@@ -139,6 +141,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
+// Hook personalizado para consumir el contexto de autenticacion desde cualquier componente hijo
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

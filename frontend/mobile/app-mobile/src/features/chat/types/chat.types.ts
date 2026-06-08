@@ -1,5 +1,5 @@
 // src/features/chat/types/chat.types.ts
-// ✅ Fuente única — elimina src/types/chat.ts
+// Modelos de dominio y DTOs del módulo de chat en tiempo real.
 
 export interface ChatMessage {
   id: string;

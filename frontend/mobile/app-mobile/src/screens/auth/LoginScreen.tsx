@@ -1,4 +1,6 @@
-// src/screens/LoginScreen.tsx
+// src/screens/auth/LoginScreen.tsx
+// Pantalla de inicio de sesión con animacion de entrada, validación básica de
+// formulario y acceso directo sin backend para entornos de desarrollo.
 
 import React, { JSX, useEffect, useRef, useState } from "react";
 import {
@@ -11,6 +13,7 @@ import {
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import loginBg from "../../../assets/login-bg.webp";
 import Divider from "../../components/Divider";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -36,6 +39,7 @@ export default function LoginScreen(): JSX.Element {
 
   const isValidEmail = (value: string) => value.includes("@");
 
+  // Muestra el error del formulario como alerta nativa cuando cambia
   useEffect(() => {
     if (error) Alert.alert("Error", error);
   }, [error]);
@@ -74,7 +78,7 @@ export default function LoginScreen(): JSX.Element {
 
   return (
     <ImageBackground
-      source={require("../../../assets/login-bg.webp")}
+      source={loginBg}
       style={styles.background}
       resizeMode="cover"
     >

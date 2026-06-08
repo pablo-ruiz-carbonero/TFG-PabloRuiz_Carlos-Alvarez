@@ -1,4 +1,3 @@
-# prueba de compatibilidad de github.
 # Proyecto TFG - Sistema Agrícola
 
 ## Descripción del Proyecto

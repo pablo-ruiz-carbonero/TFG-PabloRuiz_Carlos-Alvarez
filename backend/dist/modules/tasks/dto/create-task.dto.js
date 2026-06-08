@@ -11,6 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateTaskDto = exports.CreateTaskDto = void 0;
 const class_validator_1 = require("class-validator");
+const class_transformer_1 = require("class-transformer");
+const normalizeTipo = (value) => value?.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '') ?? value;
 class CreateTaskDto {
 }
 exports.CreateTaskDto = CreateTaskDto;
@@ -19,7 +21,8 @@ __decorate([
     __metadata("design:type", Number)
 ], CreateTaskDto.prototype, "cultivo_id", void 0);
 __decorate([
-    (0, class_validator_1.IsEnum)(['siembra', 'riego', 'fertilizacion', 'cosecha']),
+    (0, class_transformer_1.Transform)(({ value }) => normalizeTipo(value)),
+    (0, class_validator_1.IsEnum)(['siembra', 'riego', 'fertilizacion', 'cosecha', 'plaguicida']),
     __metadata("design:type", String)
 ], CreateTaskDto.prototype, "tipo", void 0);
 __decorate([
@@ -51,7 +54,8 @@ class UpdateTaskDto {
 exports.UpdateTaskDto = UpdateTaskDto;
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsEnum)(['siembra', 'riego', 'fertilizacion', 'cosecha']),
+    (0, class_transformer_1.Transform)(({ value }) => normalizeTipo(value)),
+    (0, class_validator_1.IsEnum)(['siembra', 'riego', 'fertilizacion', 'cosecha', 'plaguicida']),
     __metadata("design:type", String)
 ], UpdateTaskDto.prototype, "tipo", void 0);
 __decorate([

@@ -1,4 +1,5 @@
 // src/features/auth/types/auth.types.ts
+// Modelos de dominio y DTOs del módulo de autenticación.
 
 // FIX: los campos coinciden EXACTAMENTE con lo que devuelve el backend.
 //    Antes: "name", "phone" → Ahora: "nombre", "telefono" (igual que la BD)
@@ -32,12 +33,12 @@ export interface LoginDto {
   password: string;
 }
 
-// FIX: "nombre" y "telefono" coinciden con el RegisterDto del backend
 export interface RegisterDto {
   email: string;
   password: string;
   nombre?: string;
   telefono?: string;
+  rol?: "agricultor" | "distribuidor" | "proveedor";
 }
 
 export interface UpdateProfileDto {

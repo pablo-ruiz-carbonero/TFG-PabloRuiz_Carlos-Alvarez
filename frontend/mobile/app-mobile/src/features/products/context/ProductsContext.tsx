@@ -1,4 +1,6 @@
 // src/features/products/context/ProductsContext.tsx
+// Contexto global del marketplace: gestiona el catálogo de productos, los
+// anuncios del usuario activo y las operaciones CRUD. Soporta modo mock.
 
 import React, { createContext, useState, useCallback, useContext } from "react";
 import {
@@ -232,6 +234,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Helper centralizado de loading/error para todas las operaciones del contexto
   const run = async <T,>(fn: () => Promise<T>): Promise<T> => {
     setError(null);
     setLoading(true);
@@ -286,6 +289,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const getProductById = async (id: string): Promise<Product> => {
+    // Primero busca en el estado local para evitar una petición innecesaria
     const local = products.find((p) => p.id === id);
     if (local) return local;
 
@@ -382,6 +386,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
     return products.filter((p) => p.category === category);
   };
 
+  // Filtra por nombre, ubicación o nombre del vendedor (insensible a mayúsculas)
   const search = (query: string): Product[] => {
     if (!query.trim()) return products;
     const q = query.toLowerCase();

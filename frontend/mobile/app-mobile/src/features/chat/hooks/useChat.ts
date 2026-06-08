@@ -1,4 +1,5 @@
 // src/features/chat/hooks/useChat.ts
+// Acceso tipado al ChatContext. Lanza un error si se usa fuera del provider.
 
 import { useContext } from "react";
 import { ChatContext } from "../context/ChatContext";

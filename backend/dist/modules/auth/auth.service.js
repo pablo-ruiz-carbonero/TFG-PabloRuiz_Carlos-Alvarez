@@ -19,9 +19,11 @@ const typeorm_2 = require("typeorm");
 const jwt_1 = require("@nestjs/jwt");
 const bcrypt = require("bcrypt");
 const user_entity_1 = require("../../database/entities/user.entity");
+const role_entity_1 = require("../../database/entities/role.entity");
 let AuthService = class AuthService {
-    constructor(userRepository, jwtService) {
+    constructor(userRepository, roleRepository, jwtService) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.jwtService = jwtService;
     }
     async register(dto) {
@@ -29,18 +31,28 @@ let AuthService = class AuthService {
         if (existe)
             throw new common_1.ConflictException("El email ya está registrado");
         const hashed = await bcrypt.hash(dto.password, 10);
+        let roleId = 1;
+        if (dto.rol) {
+            const role = await this.roleRepository.findOneBy({ nombre: dto.rol });
+            if (role)
+                roleId = role.id;
+        }
         const user = this.userRepository.create({
             nombre: dto.nombre,
             email: dto.email,
             telefono: dto.telefono,
             password: hashed,
-            role: { id: 1 },
+            role: { id: roleId },
         });
         await this.userRepository.save(user);
-        const accessToken = this.generarToken(user);
+        const userConRol = await this.userRepository.findOne({
+            where: { id: user.id },
+            relations: ['role'],
+        });
+        const accessToken = this.generarToken(userConRol);
         return {
             accessToken,
-            user: this.serializarUser(user),
+            user: this.serializarUser(userConRol),
         };
     }
     async login(dto) {
@@ -68,6 +80,23 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException("Usuario no encontrado");
         return this.serializarUser(user);
     }
+    async updateProfile(userId, dto) {
+        await this.userRepository.update(userId, {
+            nombre: dto.nombre ?? dto.name,
+            telefono: dto.telefono ?? dto.phone,
+        });
+        return this.getMe(userId);
+    }
+    async changePassword(userId, dto) {
+        const user = await this.userRepository.findOneBy({ id: userId });
+        if (!user)
+            throw new common_1.UnauthorizedException('Usuario no encontrado');
+        const valido = await bcrypt.compare(dto.current_password, user.password);
+        if (!valido)
+            throw new common_1.UnauthorizedException('Contraseña actual incorrecta');
+        user.password = await bcrypt.hash(dto.new_password, 10);
+        await this.userRepository.save(user);
+    }
     generarToken(user) {
         const payload = {
             sub: user.id,
@@ -90,7 +119,9 @@ exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
+    __param(1, (0, typeorm_1.InjectRepository)(role_entity_1.Role)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
         jwt_1.JwtService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

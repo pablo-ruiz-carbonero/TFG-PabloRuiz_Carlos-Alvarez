@@ -9,8 +9,10 @@ import {
   Animated,
   ImageBackground,
   Alert,
+  StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import loginBg from "../../../assets/login-bg.webp";
 import Divider from "../../components/Divider";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -32,6 +34,7 @@ export default function RegisterScreen(): JSX.Element {
   const [telefono, setTelefono] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rol, setRol] = useState<"agricultor" | "distribuidor" | "proveedor">("agricultor");
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -78,6 +81,7 @@ export default function RegisterScreen(): JSX.Element {
         password,
         nombre,
         telefono: telefono || undefined,
+        rol,
       });
       // Si el registro tiene éxito, AuthContext setea el user y
       // AppNavigator redirige automáticamente a MainStack.
@@ -86,7 +90,7 @@ export default function RegisterScreen(): JSX.Element {
 
   return (
     <ImageBackground
-      source={require("../../../assets/login-bg.webp")}
+      source={loginBg}
       style={styles.background}
       resizeMode="cover"
     >
@@ -114,8 +118,11 @@ export default function RegisterScreen(): JSX.Element {
               placeholder="Teléfono (opcional)"
               placeholderTextColor={colors.textMuted}
               keyboardType="phone-pad"
-              onChangeText={setTelefono}
+              maxLength={15}
               value={telefono}
+              onChangeText={(v) =>
+                setTelefono(v.replace(/[^0-9+\s\-]/g, ""))
+              }
             />
 
             <TextInput
@@ -136,6 +143,24 @@ export default function RegisterScreen(): JSX.Element {
               onChangeText={setPassword}
               value={password}
             />
+
+            {/* Selector de rol */}
+            <Text style={[shared.subtitle, { fontSize: 13, marginBottom: 4 }]}>
+              Tipo de usuario
+            </Text>
+            <View style={rolStyles.group}>
+              {(["agricultor", "distribuidor", "proveedor"] as const).map((r) => (
+                <Pressable
+                  key={r}
+                  style={[rolStyles.btn, rol === r && rolStyles.btnActive]}
+                  onPress={() => setRol(r)}
+                >
+                  <Text style={[rolStyles.btnText, rol === r && rolStyles.btnTextActive]}>
+                    {r.charAt(0).toUpperCase() + r.slice(1)}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
 
             <Pressable
               onPress={handleRegister}
@@ -170,3 +195,19 @@ export default function RegisterScreen(): JSX.Element {
     </ImageBackground>
   );
 }
+
+const rolStyles = StyleSheet.create({
+  group: { flexDirection: "row", gap: 8, marginBottom: 4 },
+  btn: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: "center",
+    backgroundColor: colors.surface,
+  },
+  btnActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+  btnText: { fontSize: 13, color: colors.textMuted, fontWeight: "600" },
+  btnTextActive: { color: colors.white },
+});

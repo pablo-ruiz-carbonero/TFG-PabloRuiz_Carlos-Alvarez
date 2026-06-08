@@ -1,5 +1,6 @@
 // src/features/weather/hooks/useWeatherLocation.ts
-// Hook auxiliar: pide permisos GPS y dispara fetchWeatherByCoords
+// Hook auxiliar que solicita el permiso de ubicación GPS y, si se concede,
+// obtiene las coordenadas del dispositivo y actualiza el clima del contexto.
 
 import { useState, useCallback } from "react";
 import * as Location from "expo-location";

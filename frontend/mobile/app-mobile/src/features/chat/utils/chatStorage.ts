@@ -1,6 +1,7 @@
 // src/features/chat/utils/chatStorage.ts
-// Mock local con AsyncStorage — mismo comportamiento que el chatService original.
-// Cuando el backend esté listo, ChatContext dejará de llamar aquí y usará chatApi.ts.
+// Almacenamiento local de conversaciones y mensajes usando AsyncStorage.
+// Se usa únicamente en modo mock (EXPO_PUBLIC_USE_MOCK=true).
+// Incluye datos de semilla para demostración.
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ChatConversation, ChatMessage } from "../types/chat.types";
@@ -114,6 +115,7 @@ export const loadConversations = async (): Promise<ChatConversation[]> => {
   try {
     const raw = await AsyncStorage.getItem(CONV_KEY);
     if (raw) return JSON.parse(raw);
+    // Primera carga: inicializa el almacenamiento con los datos de semilla
     await AsyncStorage.setItem(CONV_KEY, JSON.stringify(SEED_CONVERSATIONS));
     return SEED_CONVERSATIONS;
   } catch {

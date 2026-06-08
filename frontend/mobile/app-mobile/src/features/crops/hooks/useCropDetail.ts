@@ -1,6 +1,7 @@
 // src/features/crops/hooks/useCropDetail.ts
-// Ahora solo es una vista sobre el estado del CropsContext — no tiene
-// estado propio de tareas, por eso las tareas persisten entre pantallas.
+// Vista derivada del CropsContext para un cultivo concreto.
+// No tiene estado propio de tareas; las obtiene del contexto global,
+// lo que permite que persistan al navegar entre pantallas.
 
 import { useCallback } from "react";
 import { Crop, Task, CreateTaskDto } from "../types/crops.types";

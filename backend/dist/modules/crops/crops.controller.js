@@ -11,7 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CropsController = void 0;
 const common_1 = require("@nestjs/common");
@@ -141,7 +140,7 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, typeof (_a = typeof activity_dto_1.CreateActivityDto !== "undefined" && activity_dto_1.CreateActivityDto) === "function" ? _a : Object, Object]),
+    __metadata("design:paramtypes", [String, activity_dto_1.CreateActivityDto, Object]),
     __metadata("design:returntype", Promise)
 ], CropsController.prototype, "createActivity", null);
 __decorate([

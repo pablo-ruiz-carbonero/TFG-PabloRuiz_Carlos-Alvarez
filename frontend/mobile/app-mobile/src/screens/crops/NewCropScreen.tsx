@@ -85,11 +85,13 @@ export default function NewCorpScreen() {
       Alert.alert("Campo requerido", "Selecciona una parcela");
       return;
     }
-    if (!surfaceArea || isNaN(parseFloat(surfaceArea))) {
-      Alert.alert(
-        "Campo inválido",
-        "Introduce una superficie válida en hectáreas",
-      );
+    const surfaceNum = parseFloat(surfaceArea);
+    if (!surfaceArea || isNaN(surfaceNum) || surfaceNum <= 0) {
+      Alert.alert("Campo inválido", "La superficie debe ser mayor que 0 ha");
+      return;
+    }
+    if (surfaceNum > 50000) {
+      Alert.alert("Campo inválido", "La superficie no puede superar 50 000 ha");
       return;
     }
 
@@ -98,7 +100,7 @@ export default function NewCorpScreen() {
       variety: variety.trim(),
       cropType,
       parcelId,
-      surfaceArea: parseFloat(surfaceArea),
+      surfaceArea: surfaceNum,
       seedDate: seedDate.toISOString().split("T")[0],
       notes: notes.trim() || undefined,
     };
@@ -217,7 +219,12 @@ export default function NewCorpScreen() {
             placeholderTextColor={colors.textMuted}
             keyboardType="decimal-pad"
             value={surfaceArea}
-            onChangeText={setSurfaceArea}
+            maxLength={10}
+            onChangeText={(v) => {
+              // Solo dígitos y un punto decimal
+              const clean = v.replace(/[^0-9.]/g, "").replace(/(\..*)\./g, "$1");
+              setSurfaceArea(clean);
+            }}
           />
         </View>
 

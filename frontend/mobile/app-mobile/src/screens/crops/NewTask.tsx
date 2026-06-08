@@ -180,10 +180,13 @@ export default function NewTask() {
                   ]}
                   onPress={() => setTaskType(type)}
                 >
-                  {React.cloneElement(icon as React.ReactElement, {
-                    color:
-                      taskType === type ? colors.primary : colors.textSecond,
-                  })}
+                  {React.cloneElement(
+                    icon as React.ReactElement<{ color?: string }>,
+                    {
+                      color:
+                        taskType === type ? colors.primary : colors.textSecond,
+                    },
+                  )}
                   <Text
                     style={[
                       styles.typeLabel,
@@ -338,10 +341,16 @@ export default function NewTask() {
             <Text style={styles.summaryTitle}>Resumen</Text>
             <View style={styles.summaryBody}>
               {summaryIcon &&
-                React.cloneElement(summaryIcon.icon as React.ReactElement, {
-                  size: 16,
-                  color: colors.primary,
-                })}
+                React.cloneElement(
+                  summaryIcon.icon as React.ReactElement<{
+                    size?: number;
+                    color?: string;
+                  }>,
+                  {
+                    size: 16,
+                    color: colors.primary,
+                  },
+                )}
               <Text style={styles.summaryText}>
                 {" "}
                 {taskType} el {fmtDate(date)}

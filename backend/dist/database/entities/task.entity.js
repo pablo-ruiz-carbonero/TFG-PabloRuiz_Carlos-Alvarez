@@ -22,7 +22,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({
         type: 'enum',
-        enum: ['siembra', 'riego', 'fertilizacion', 'cosecha']
+        enum: ['siembra', 'riego', 'fertilizacion', 'cosecha', 'plaguicida'],
     }),
     __metadata("design:type", String)
 ], Task.prototype, "tipo", void 0);

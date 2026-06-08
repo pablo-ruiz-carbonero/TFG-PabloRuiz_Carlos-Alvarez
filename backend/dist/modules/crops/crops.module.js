@@ -12,12 +12,17 @@ const typeorm_1 = require("@nestjs/typeorm");
 const crops_service_1 = require("./crops.service");
 const crops_controller_1 = require("./crops.controller");
 const crop_entity_1 = require("../../database/entities/crop.entity");
+const parcela_entity_1 = require("../../database/entities/parcela.entity");
+const tasks_module_1 = require("../tasks/tasks.module");
 let CropsModule = class CropsModule {
 };
 exports.CropsModule = CropsModule;
 exports.CropsModule = CropsModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([crop_entity_1.Crop])],
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([crop_entity_1.Crop, parcela_entity_1.Parcela]),
+            tasks_module_1.TasksModule,
+        ],
         controllers: [crops_controller_1.CropsController],
         providers: [crops_service_1.CropsService],
         exports: [crops_service_1.CropsService],

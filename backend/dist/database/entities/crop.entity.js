@@ -85,13 +85,22 @@ __decorate([
     __metadata("design:type", Number)
 ], Crop.prototype, "parcelaId", void 0);
 __decorate([
+    (0, typeorm_1.ManyToOne)('Parcela', { nullable: true, eager: false }),
+    (0, typeorm_1.JoinColumn)({ name: 'parcela_id' }),
+    __metadata("design:type", Object)
+], Crop.prototype, "parcela", void 0);
+__decorate([
     (0, typeorm_1.CreateDateColumn)({ name: 'fecha_creacion' }),
     __metadata("design:type", Date)
 ], Crop.prototype, "fechaCreacion", void 0);
 __decorate([
-    (0, typeorm_1.UpdateDateColumn)(),
+    (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt' }),
     __metadata("design:type", Date)
 ], Crop.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)('Task', 'cultivo'),
+    __metadata("design:type", Array)
+], Crop.prototype, "tareas", void 0);
 exports.Crop = Crop = __decorate([
     (0, typeorm_1.Entity)('cultivos')
 ], Crop);

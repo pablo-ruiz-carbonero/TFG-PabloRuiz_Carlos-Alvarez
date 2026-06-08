@@ -1,3 +1,4 @@
+// Servicio meteorológico: obtiene datos reales de OpenWeather o genera datos de simulacion si no hay clave API.
 import { WeatherData } from '../types';
 
 const WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5';
@@ -54,7 +55,7 @@ export const weatherService = {
     lat?: number,
     lon?: number
   ): Promise<WeatherData> => {
-    // Read the key dynamically at request time to pick up live updates
+    // Leer la clave en cada llamada para no depender del valor en el momento de importación del módulo
     const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
     
     if (apiKey && apiKey.trim() !== '') {
@@ -85,7 +86,7 @@ export const weatherService = {
         if (!forecastRes.ok) throw new Error(`Forecast fetch failed: ${forecastRes.status}`);
         const forecastData = await forecastRes.json();
 
-        // Group forecast items by date (YYYY-MM-DD)
+        // Agrupar las lecturas del pronóstico por día (YYYY-MM-DD), ya que la API devuelve intervalos de 3 horas
         const readingsByDate: Record<string, any[]> = {};
         forecastData.list.forEach((item: any) => {
           const dateStr = item.dt_txt.split(' ')[0];
@@ -95,7 +96,7 @@ export const weatherService = {
           readingsByDate[dateStr].push(item);
         });
 
-        // Filter and map to 1 reading per day (preferring 12:00:00 noon, fallback to first reading of that day)
+        // Reducir a 1 lectura por día: se prefiere la del mediodía por ser la más representativa
         const dailyForecast: WeatherData['forecast'] = [];
         Object.keys(readingsByDate).sort().forEach((dateStr) => {
           const dayReadings = readingsByDate[dateStr];
@@ -117,7 +118,7 @@ export const weatherService = {
           tempMin: Math.round(currentData.main.temp_min),
           tempMax: Math.round(currentData.main.temp_max),
           humidity: currentData.main.humidity,
-          windSpeed: Math.round(currentData.wind.speed * 3.6), // m/s to km/h
+          windSpeed: Math.round(currentData.wind.speed * 3.6), // conversión m/s a km/h
           description: currentData.weather[0].description,
           icon: currentData.weather[0].icon,
           condition: currentData.weather[0].main,
@@ -128,14 +129,14 @@ export const weatherService = {
       }
     }
 
-    // --- Dynamic Mock Data Fallback ---
-    // If the region exists in predefined mocks, use it. Otherwise, hash the name to generate realistic data.
+    // Si no hay clave API o falló la petición, se cae al modo simulación
+    // Si la región está predefinida se usan sus datos; si no, se deriva un valor consistente a partir del nombre
     let mockBase: Omit<WeatherData, 'forecast'>;
     
     if (MOCK_REGIONS_WEATHER[regionName]) {
       mockBase = MOCK_REGIONS_WEATHER[regionName];
     } else {
-      // Hashing city query to get consistent, pseudo-random coordinates and values
+      // Hash del nombre de ciudad para generar valores pseudo-aleatorios pero siempre consistentes
       const getSeed = (str: string) => {
         let hash = 0;
         for (let i = 0; i < str.length; i++) {

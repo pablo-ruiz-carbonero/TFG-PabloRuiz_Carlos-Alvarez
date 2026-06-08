@@ -1,4 +1,6 @@
-// src/features/auth/utils/tokenStorage.ts
+// src/features/products/utils/tokenStorage.ts
+// Duplicado del helper de auth para acceder al token JWT desde la feature de productos.
+// Pendiente de unificar con src/features/auth/utils/tokenStorage.ts.
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 

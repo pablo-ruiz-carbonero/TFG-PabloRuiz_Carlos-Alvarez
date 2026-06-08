@@ -9,20 +9,23 @@ export declare class CropsController {
     create(createCropDto: CreateCropDto, req: any): Promise<import("../../database/entities/crop.entity").Crop>;
     findAll(req: any): Promise<import("../../database/entities/crop.entity").Crop[]>;
     findByFarmer(req: any): Promise<import("../../database/entities/crop.entity").Crop[]>;
-    getParcels(req: any): Promise<{
-        id: number;
-        nombre: string;
-        ubicacion: string;
-        tamano: number;
-    }[]>;
+    getParcels(req: any): Promise<import("../../database/entities/parcela.entity").Parcela[]>;
     createParcel(body: {
         nombre: string;
         ubicacion?: string;
         tamano?: number;
-    }, req: any): any;
+    }, req: any): Promise<import("../../database/entities/parcela.entity").Parcela>;
     findOne(id: string, req: any): Promise<import("../../database/entities/crop.entity").Crop>;
     update(id: string, updateCropDto: UpdateCropDto, req: any): Promise<import("../../database/entities/crop.entity").Crop>;
     remove(id: string, req: any): Promise<void>;
-    createActivity(cropId: string, dto: CreateActivityDto, req: any): Promise<any>;
+    createActivity(cropId: string, dto: CreateActivityDto, req: any): Promise<{
+        id: any;
+        cropId: any;
+        type: string;
+        date: any;
+        details: any;
+        quantity: any;
+        unit: any;
+    }>;
     deleteActivity(activityId: string, req: any): Promise<void>;
 }

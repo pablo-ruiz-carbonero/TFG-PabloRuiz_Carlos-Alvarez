@@ -1,4 +1,6 @@
 // src/features/crops/api/tasksApi.ts
+// Capa de red para tareas agrícolas asociadas a cultivos.
+// Incluye la lógica de toggle de estado (pendiente/completada).
 
 import { Task, CreateTaskDto } from "../types/crops.types";
 import { mapTask } from "../utils/cropMappers";
@@ -66,6 +68,7 @@ export const toggleTaskStatusRequest = async (
   taskId: string,
   currentStatus: "pendiente" | "completada",
 ): Promise<Task> => {
+  // Calcula el nuevo estado opuesto al actual antes de enviar el PATCH
   const newStatus = currentStatus === "pendiente" ? "completada" : "pendiente";
   const res = await fetch(`${API_URL}/tasks/${taskId}`, {
     method: "PATCH",

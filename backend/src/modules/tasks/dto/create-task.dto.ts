@@ -1,10 +1,18 @@
+// DTOs de tareas agrícolas. La normalización del campo 'tipo' tolera variaciones de mayúsculas
+// y tildes que pueden llegar del frontend móvil o de integraciones externas.
 import { IsString, IsNumber, IsOptional, IsDateString, IsEnum } from 'class-validator';
+import { Transform } from 'class-transformer';
+
+// Normaliza a minúsculas sin tildes para aceptar tanto "Riego" como "riego" o "Fertilización"
+const normalizeTipo = (value: string): string =>
+  value?.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '') ?? value;
 
 export class CreateTaskDto {
   @IsNumber()
   cultivo_id: number;
 
-  @IsEnum(['siembra', 'riego', 'fertilizacion', 'cosecha'])
+  @Transform(({ value }) => normalizeTipo(value))
+  @IsEnum(['siembra', 'riego', 'fertilizacion', 'cosecha', 'plaguicida'])
   tipo: string;
 
   @IsDateString()
@@ -29,7 +37,8 @@ export class CreateTaskDto {
 
 export class UpdateTaskDto {
   @IsOptional()
-  @IsEnum(['siembra', 'riego', 'fertilizacion', 'cosecha'])
+  @Transform(({ value }) => normalizeTipo(value))
+  @IsEnum(['siembra', 'riego', 'fertilizacion', 'cosecha', 'plaguicida'])
   tipo?: string;
 
   @IsOptional()

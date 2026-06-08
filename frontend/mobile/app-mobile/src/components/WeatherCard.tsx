@@ -1,4 +1,6 @@
 // src/components/WeatherCard.tsx
+// Tarjeta resumen del clima actual mostrada en HomeScreen.
+// Obtiene los datos del WeatherContext y navega a WeatherScreen al tocarla.
 
 import React, { useEffect } from "react";
 import {
@@ -36,6 +38,7 @@ export default function WeatherCard() {
   const { weatherData, loading, error, fetchWeatherByCity, currentCity } =
     useWeather();
 
+  // Carga el clima al montar si el contexto todavía no tiene datos
   useEffect(() => {
     if (!weatherData && !loading) {
       fetchWeatherByCity(currentCity || "Sevilla");

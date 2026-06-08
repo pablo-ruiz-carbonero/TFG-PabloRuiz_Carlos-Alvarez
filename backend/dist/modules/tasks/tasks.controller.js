@@ -24,6 +24,9 @@ let TasksController = class TasksController {
     create(createTaskDto, req) {
         return this.tasksService.create(createTaskDto, req.user.id);
     }
+    getPendingCount(cropId, req) {
+        return this.tasksService.getPendingCount(+cropId, req.user.id);
+    }
     findAllByCrop(cropId, req) {
         return this.tasksService.findAllByCrop(+cropId, req.user.id);
     }
@@ -36,9 +39,6 @@ let TasksController = class TasksController {
     remove(id, req) {
         return this.tasksService.remove(+id, req.user.id);
     }
-    getPendingCount(cropId, req) {
-        return this.tasksService.getPendingCount(+cropId, req.user.id);
-    }
 };
 exports.TasksController = TasksController;
 __decorate([
@@ -49,6 +49,14 @@ __decorate([
     __metadata("design:paramtypes", [create_task_dto_1.CreateTaskDto, Object]),
     __metadata("design:returntype", void 0)
 ], TasksController.prototype, "create", null);
+__decorate([
+    (0, common_1.Get)('crop/:cropId/pending-count'),
+    __param(0, (0, common_1.Param)('cropId')),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], TasksController.prototype, "getPendingCount", null);
 __decorate([
     (0, common_1.Get)('crop/:cropId'),
     __param(0, (0, common_1.Param)('cropId')),
@@ -82,14 +90,6 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], TasksController.prototype, "remove", null);
-__decorate([
-    (0, common_1.Get)('crop/:cropId/pending-count'),
-    __param(0, (0, common_1.Param)('cropId')),
-    __param(1, (0, common_1.Request)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", void 0)
-], TasksController.prototype, "getPendingCount", null);
 exports.TasksController = TasksController = __decorate([
     (0, common_1.Controller)('tasks'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),

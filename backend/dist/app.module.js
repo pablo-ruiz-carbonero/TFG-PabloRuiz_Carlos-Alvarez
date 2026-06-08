@@ -13,6 +13,10 @@ const typeorm_1 = require("@nestjs/typeorm");
 const auth_module_1 = require("./modules/auth/auth.module");
 const crops_module_1 = require("./modules/crops/crops.module");
 const tasks_module_1 = require("./modules/tasks/tasks.module");
+const products_module_1 = require("./modules/products/products.module");
+const conversations_module_1 = require("./modules/conversations/conversations.module");
+const productions_module_1 = require("./modules/productions/productions.module");
+const admin_module_1 = require("./modules/admin/admin.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -36,6 +40,10 @@ exports.AppModule = AppModule = __decorate([
             auth_module_1.AuthModule,
             crops_module_1.CropsModule,
             tasks_module_1.TasksModule,
+            products_module_1.ProductsModule,
+            conversations_module_1.ConversationsModule,
+            productions_module_1.ProductionsModule,
+            admin_module_1.AdminModule,
         ],
     })
 ], AppModule);

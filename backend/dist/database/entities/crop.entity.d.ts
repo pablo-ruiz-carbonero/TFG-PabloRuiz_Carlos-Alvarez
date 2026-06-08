@@ -17,6 +17,8 @@ export declare class Crop {
     status: string;
     usuario: User;
     parcelaId: number;
+    parcela: any;
     fechaCreacion: Date;
     updatedAt: Date;
+    tareas: any[];
 }

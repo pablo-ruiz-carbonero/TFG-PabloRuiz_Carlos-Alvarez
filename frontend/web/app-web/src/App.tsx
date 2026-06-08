@@ -1,3 +1,4 @@
+// Punto de entrada de la aplicacion: define el enrutamiento principal y la estructura de layout con rutas publicas y privadas.
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
@@ -14,9 +15,11 @@ import { Crops } from './pages/Crops';
 import { Marketplace } from './pages/Marketplace';
 import { Messages } from './pages/Messages';
 import { Profile } from './pages/Profile';
+import { Admin } from './pages/Admin';
 
-// Layout Wrapper for Private Views
+// Layout compartido por todas las vistas privadas: incluye Navbar, Sidebar y el selector de rol flotante
 const AppLayout: React.FC = () => {
+  // Estado del sidebar en movil (en escritorio siempre visible via CSS)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
@@ -60,7 +63,17 @@ function App() {
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/profile" element={<Profile />} />
-            
+
+            {/* Admin panel — only admin role */}
+            <Route
+              path="/admin"
+              element={
+                <PrivateRoute allowedRoles={['admin']}>
+                  <Admin />
+                </PrivateRoute>
+              }
+            />
+
             {/* Default page redirects */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
           </Route>

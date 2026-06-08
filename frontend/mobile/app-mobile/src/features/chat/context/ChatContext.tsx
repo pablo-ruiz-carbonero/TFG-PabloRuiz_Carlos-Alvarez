@@ -1,4 +1,7 @@
 // src/features/chat/context/ChatContext.tsx
+// Contexto global del chat: gestiona la lista de conversaciones y el envío
+// de mensajes. En modo desarrollo usa chatStorage (AsyncStorage); en producción,
+// llama directamente a chatApi.
 
 import React, { createContext, useState, useCallback } from "react";
 import { ChatConversation, ChatMessage, CreateConversationDto } from "../types/chat.types";
@@ -128,7 +131,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     return getOrCreateConversationRequest(dto);
   };
 
-  // Actualiza el último mensaje en la lista sin refetch
+  // Actualiza el resumen de la conversación localmente tras enviar un mensaje,
+  // evitando un refetch innecesario de todas las conversaciones
   const updateConversationLastMessage = (convId: string, text: string) => {
     const time = new Date().toLocaleTimeString("es-ES", {
       hour: "2-digit",

@@ -1,7 +1,8 @@
+// Barra lateral de navegacion: filtra los enlaces segun el rol del usuario y muestra un backdrop en movil.
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { LayoutDashboard, Sprout, ShoppingBag, MessageSquare, ShieldAlert, User as UserIcon } from 'lucide-react';
+import { LayoutDashboard, Sprout, ShoppingBag, MessageSquare, ShieldAlert, ShieldCheck, User as UserIcon } from 'lucide-react';
 import { UserRole } from '../../types';
 
 interface SidebarProps {
@@ -46,8 +47,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       path: '/profile',
       icon: <UserIcon size={20} />,
     },
+    {
+      name: 'Panel Admin',
+      path: '/admin',
+      icon: <ShieldCheck size={20} />,
+      allowedRoles: ['admin'],
+    },
   ];
 
+  // Mostrar solo los enlaces permitidos para el rol actual; los items sin allowedRoles son visibles para todos
   const filteredItems = navItems.filter(
     item => !item.allowedRoles || (user && item.allowedRoles.includes(user.role))
   );

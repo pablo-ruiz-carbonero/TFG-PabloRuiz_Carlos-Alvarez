@@ -1,4 +1,6 @@
 // src/features/auth/context/AuthContext.tsx
+// Contexto global de autenticación: gestiona el token JWT, el usuario activo,
+// y expone las operaciones de login, registro, logout y edición de perfil.
 
 import React, { createContext, useCallback, useEffect, useState } from "react";
 import {
@@ -17,9 +19,10 @@ import {
 import { saveToken, getToken, removeToken } from "../utils/tokenStorage";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// DEV BYPASS — solo activo en desarrollo (__DEV__ = true en Expo)
+// DEV BYPASS — solo activo si EXPO_PUBLIC_DEV_BYPASS=true en .env
+// Desactivado por defecto para forzar auth real incluso en desarrollo
 // ─────────────────────────────────────────────────────────────────────────────
-const DEV_BYPASS = __DEV__;
+const DEV_BYPASS = __DEV__ && process.env.EXPO_PUBLIC_DEV_BYPASS === "true";
 
 const DEV_USER: User = {
   id: 0,
@@ -110,6 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const changePassword = async (dto: ChangePasswordDto) => {
+    // En modo DEV sin token, simula la petición con un retardo
     if (DEV_BYPASS && !token) {
       await new Promise((r) => setTimeout(r, 600));
       return;

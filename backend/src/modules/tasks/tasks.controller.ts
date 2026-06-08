@@ -1,3 +1,4 @@
+// Controlador de tareas. Todas las rutas requieren JWT y filtran por el usuario del token.
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto, UpdateTaskDto } from './dto/create-task.dto';
@@ -11,6 +12,12 @@ export class TasksController {
   @Post()
   create(@Body() createTaskDto: CreateTaskDto, @Request() req: any) {
     return this.tasksService.create(createTaskDto, req.user.id);
+  }
+
+  // Esta ruta debe ir antes de /crop/:cropId para que "pending-count" no se confunda con un cropId numérico
+  @Get('crop/:cropId/pending-count')
+  getPendingCount(@Param('cropId') cropId: string, @Request() req: any) {
+    return this.tasksService.getPendingCount(+cropId, req.user.id);
   }
 
   @Get('crop/:cropId')
@@ -31,10 +38,5 @@ export class TasksController {
   @Delete(':id')
   remove(@Param('id') id: string, @Request() req: any) {
     return this.tasksService.remove(+id, req.user.id);
-  }
-
-  @Get('crop/:cropId/pending-count')
-  getPendingCount(@Param('cropId') cropId: string, @Request() req: any) {
-    return this.tasksService.getPendingCount(+cropId, req.user.id);
   }
 }

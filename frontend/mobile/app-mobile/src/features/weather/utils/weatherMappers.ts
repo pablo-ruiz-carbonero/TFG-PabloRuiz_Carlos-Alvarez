@@ -1,5 +1,6 @@
 // src/features/weather/utils/weatherMappers.ts
-// Transforma la respuesta cruda de OpenWeatherMap al modelo de dominio
+// Transforma las respuestas crudas de OpenWeatherMap a los modelos de dominio
+// del frontend. Incluye la derivación de alertas agrícolas a partir del pronóstico.
 
 import {
   CurrentWeather,
@@ -29,6 +30,7 @@ export const owmCodeToEmoji = (id: number): string => {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+// Convierte un timestamp UNIX en hora local aplicando el offset de zona horaria de OWM
 const fmtTime = (unix: number, offsetSecs: number): string => {
   const date = new Date((unix + offsetSecs) * 1000);
   const hh = String(date.getUTCHours()).padStart(2, "0");
@@ -36,12 +38,13 @@ const fmtTime = (unix: number, offsetSecs: number): string => {
   return `${hh}:${mm}`;
 };
 
+// Genera la etiqueta abreviada del día de la semana en español ("Lun", "Mar"...)
 const fmtDayLabel = (dateStr: string): string => {
   const date = new Date(dateStr + "T12:00:00");
   return date
     .toLocaleDateString("es-ES", { weekday: "short" })
     .replace(".", "")
-    .replace(/^\w/, (c) => c.toUpperCase()); // "Lun", "Mar"...
+    .replace(/^\w/, (c) => c.toUpperCase());
 };
 
 // ─── Current weather ─────────────────────────────────────────────────────────
@@ -97,7 +100,7 @@ export const mapForecast = (raw: any): ForecastDay[] => {
       const humidity = entries.map((e) => e.main?.humidity ?? 0);
       const winds = entries.map((e) => (e.wind?.speed ?? 0) * 3.6);
 
-      // Condición más representativa: la entrada de mediodía o la primera
+      // La entrada de las 12:00 representa mejor las condiciones diurnas
       const midday =
         entries.find((e) => e.dt_txt?.includes("12:00:00")) ?? entries[0];
       const weather = midday.weather?.[0] ?? {};
@@ -193,5 +196,18 @@ export const mapWeatherData = (
   const current = mapCurrentWeather(currentRaw);
   const forecast = mapForecast(forecastRaw);
   const alerts = deriveAgriculturalAlerts(forecast);
+
+  // OWM free-tier devuelve temp_min == temp_max == temp en el endpoint /weather.
+  // Sobreescribimos con el rango real del día usando las entradas de /forecast.
+  const today = new Date().toISOString().slice(0, 10);
+  const todayEntries = (forecastRaw.list ?? []).filter(
+    (e: any) => e.dt_txt?.slice(0, 10) === today,
+  );
+  if (todayEntries.length > 0) {
+    const temps = todayEntries.map((e: any) => e.main?.temp ?? 0);
+    current.tempMin = Math.round(Math.min(...temps));
+    current.tempMax = Math.round(Math.max(...temps));
+  }
+
   return { current, forecast, alerts };
 };
