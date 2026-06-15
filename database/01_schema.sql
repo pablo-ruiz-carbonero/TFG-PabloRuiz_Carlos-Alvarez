@@ -60,7 +60,7 @@ CREATE TABLE
     tareas (
         id INT AUTO_INCREMENT PRIMARY KEY,
         cultivo_id INT,
-        tipo ENUM ('siembra', 'riego', 'fertilizacion', 'cosecha'),
+        tipo ENUM ('siembra', 'riego', 'fertilizacion', 'cosecha', 'plaguicida'),
         fecha DATE,
         hora TIME,
         descripcion TEXT,
